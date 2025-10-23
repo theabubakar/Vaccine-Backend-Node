@@ -1,0 +1,59 @@
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: vaccine-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: vaccine_management
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - vaccine-network
+
+  # Backend API
+  backend:
+    build: .
+    container_name: vaccine-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/vaccine_management?authSource=admin
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    networks:
+      - vaccine-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Flutter Web App
+  frontend:
+    build: 
+      context: ./vaccine_app
+      dockerfile: Dockerfile
+    container_name: vaccine-frontend
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    networks:
+      - vaccine-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  vaccine-network:
+    driver: bridge
