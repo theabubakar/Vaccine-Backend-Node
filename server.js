@@ -10,6 +10,8 @@ const vaccineRoutes = require('./routes/vaccineRoutes');
 const doseRoutes = require('./routes/doseRoutes');
 const brandRoutes = require('./routes/brandRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
+const authRoutes = require('./routes/authRoutes');
+const clinicRoutes = require('./routes/clinicRoutes');
 
 // Load environment variables
 require('dotenv').config({ path: './config.env' });
@@ -37,6 +39,8 @@ app.use('/api/vaccines', vaccineRoutes);
 app.use('/api/doses', doseRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/doctors', doctorRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/clinics', clinicRoutes);
 
 /**
  * @swagger
@@ -81,7 +85,9 @@ app.get('/', (req, res) => {
       vaccines: '/api/vaccines',
       doses: '/api/doses',
       brands: '/api/brands',
-      doctors: '/api/doctors'
+      doctors: '/api/doctors',
+      auth: '/api/auth',
+      clinics: '/api/clinics'
     }
   });
 });
@@ -112,4 +118,6 @@ app.listen(PORT, () => {
   console.log(`💊 Doses API: http://localhost:${PORT}/api/doses`);
   console.log(`🏷️ Brands API: http://localhost:${PORT}/api/brands`);
   console.log(`👨‍⚕️ Doctors API: http://localhost:${PORT}/api/doctors`);
+  console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
+  console.log(`🏥 Clinics API: http://localhost:${PORT}/api/clinics`);
 });
